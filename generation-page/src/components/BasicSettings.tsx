@@ -1,64 +1,103 @@
-'use client'
+"use client";
+import { generateSchedule } from "../lib/generate";
 
 interface BasicSettingsProps {
-  register: any
-  watch: any
-  errors: any
+  register: any;
+  watch: any;
+  errors: any;
+  timePreferences: any[];
+  priorityBlocks: any[];
+  channels: any[];
+  onGenerate: (data: any) => void;
 }
 
-export function BasicSettings({ register, watch, errors }: BasicSettingsProps) {
-  const formValues = watch()
+export function BasicSettings({
+  register,
+  watch,
+  errors,
+  timePreferences,
+  priorityBlocks,
+  channels,
+  onGenerate,
+}: BasicSettingsProps) {
+  const formValues = watch();
 
-  const sliderSettings = [
+    const sliderSettings = [
     {
-      key: 'min_duration',
-      label: 'Min Duration',
+      key: "min_duration",
+      label: "Min Duration",
       min: 1,
       max: 120,
-      unit: 'min',
-      description: 'Minimum segment duration'
+      unit: "min",
+      description: "Minimum segment duration",
     },
     {
-      key: 'max_consecutive_genre',
-      label: 'Max Consecutive Genre',
+      key: "max_consecutive_genre",
+      label: "Max Consecutive Genre",
       min: 1,
       max: 10,
-      unit: 'genre',
-      description: 'Maximum same genre repetitions'
+      unit: "genre",
+      description: "Maximum same genre repetitions",
     },
     {
-      key: 'channels_count',
-      label: 'Channels Count',
+      key: "channels_count",
+      label: "Channels Count",
       min: 1,
       max: 50,
-      unit: 'channels',
-      description: 'Total broadcast channels'
+      unit: "channels",
+      description: "Total broadcast channels",
     },
     {
-      key: 'switch_penalty',
-      label: 'Switch Penalty',
+      key: "switch_penalty",
+      label: "Switch Penalty",
       min: 0,
       max: 20,
-      unit: 'pts',
-      description: 'Penalty for channel switches'
+      unit: "pts",
+      description: "Penalty for channel switches",
     },
     {
-      key: 'termination_penalty',
-      label: 'Termination Penalty',
+      key: "termination_penalty",
+      label: "Termination Penalty",
       min: 0,
       max: 20,
-      unit: 'pts',
-      description: 'Penalty for early termination'
+      unit: "pts",
+      description: "Penalty for early termination",
     },
-  ]
+  ];
 
+  const buildConfig = () => ({
+    ...formValues,
+    time_preferences: timePreferences,
+    priority_blocks: priorityBlocks,
+    channels: channels,
+  });
+
+  const generateData = () => {
+    const fullConfig = buildConfig();
+    const data = generateSchedule(fullConfig);
+    onGenerate(data);
+  };
   return (
     <div className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-md">
-      <div className="border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100/50 px-6 py-4">
-        <h2 className="text-lg font-semibold text-slate-900">Basic Settings</h2>
-        <p className="text-xs text-slate-600 mt-0.5">Configure core scheduling parameters</p>
+      <div className="flex justify-between items-center border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100/50 px-6 py-4">
+        <div>
+          <h2 className="text-lg font-semibold text-slate-900">
+            Basic Settings
+          </h2>
+          <p className="text-xs text-slate-600 mt-0.5">
+            Configure core scheduling parameters
+          </p>
+        </div>
+        <div>
+          <button
+            onClick={() => generateData()}
+            className="bg-blue-500 text-white rounded p-1"
+          >
+            Generate JSON
+          </button>
+        </div>
       </div>
-      
+
       <div className="space-y-6 p-6">
         {/* Time Inputs */}
         <div className="space-y-4">
@@ -70,17 +109,21 @@ export function BasicSettings({ register, watch, errors }: BasicSettingsProps) {
               <div className="relative">
                 <input
                   type="number"
-                  {...register('opening_time', { valueAsNumber: true })}
+                  {...register("opening_time", { valueAsNumber: true })}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
                   placeholder="0"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">min</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">
+                  min
+                </span>
               </div>
               {errors.opening_time && (
-                <p className="mt-1 text-xs text-red-600">{errors.opening_time.message}</p>
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.opening_time.message}
+                </p>
               )}
             </div>
-            
+
             <div>
               <label className="block text-sm font-semibold text-slate-900 mb-2">
                 Closing Time
@@ -88,14 +131,18 @@ export function BasicSettings({ register, watch, errors }: BasicSettingsProps) {
               <div className="relative">
                 <input
                   type="number"
-                  {...register('closing_time', { valueAsNumber: true })}
+                  {...register("closing_time", { valueAsNumber: true })}
                   className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
                   placeholder="0"
                 />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">min</span>
+                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">
+                  min
+                </span>
               </div>
               {errors.closing_time && (
-                <p className="mt-1 text-xs text-red-600">{errors.closing_time.message}</p>
+                <p className="mt-1 text-xs text-red-600">
+                  {errors.closing_time.message}
+                </p>
               )}
             </div>
           </div>
@@ -110,23 +157,29 @@ export function BasicSettings({ register, watch, errors }: BasicSettingsProps) {
                   <label className="text-sm font-semibold text-slate-900">
                     {setting.label}
                   </label>
-                  <p className="text-xs text-slate-600 mt-0.5">{setting.description}</p>
+                  <p className="text-xs text-slate-600 mt-0.5">
+                    {setting.description}
+                  </p>
                 </div>
                 <div className="flex items-baseline gap-1 bg-blue-50 px-3 py-1.5 rounded-lg border border-blue-200">
                   <span className="text-xl font-bold text-blue-600">
                     {formValues[setting.key as keyof typeof formValues]}
                   </span>
-                  <span className="text-xs font-medium text-slate-600">{setting.unit}</span>
+                  <span className="text-xs font-medium text-slate-600">
+                    {setting.unit}
+                  </span>
                 </div>
               </div>
-              
+
               <input
                 type="range"
                 {...register(setting.key as any, { valueAsNumber: true })}
                 min={setting.min}
                 max={setting.max}
                 step={1}
-                defaultValue={formValues[setting.key as keyof typeof formValues]}
+                defaultValue={
+                  formValues[setting.key as keyof typeof formValues]
+                }
                 className="w-full h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-blue-600"
               />
             </div>
@@ -134,5 +187,5 @@ export function BasicSettings({ register, watch, errors }: BasicSettingsProps) {
         </div>
       </div>
     </div>
-  )
+  );
 }

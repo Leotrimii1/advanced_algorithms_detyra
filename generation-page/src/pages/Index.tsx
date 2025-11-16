@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import * as z from 'zod'
-import { Plus, Minus, Copy, Check } from 'lucide-react'
-import { BasicSettings } from '../components/BasicSettings'
-import { Channels } from '../components/Channels'
-import { PriorityBlocks } from '../components/PriorityBlocks'
-import { TimePreferences } from '../components/TimePreference'
+import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import * as z from "zod";
+import { Plus, Minus, Copy, Check } from "lucide-react";
+import { BasicSettings } from "../components/BasicSettings";
+import { Channels } from "../components/Channels";
+import { PriorityBlocks } from "../components/PriorityBlocks";
+import { TimePreferences } from "../components/TimePreference";
 
 const configSchema = z.object({
   opening_time: z.number().min(0).max(1440),
@@ -18,23 +18,28 @@ const configSchema = z.object({
   channels_count: z.number().min(1),
   switch_penalty: z.number().min(0),
   termination_penalty: z.number().min(0),
-})
+});
 
-type ConfigFormData = z.infer<typeof configSchema>
+type ConfigFormData = z.infer<typeof configSchema>;
 
 interface ConfigData extends ConfigFormData {
-  time_preferences: any[]
-  priority_blocks: any[]
-  channels: any[]
+  time_preferences: any[];
+  priority_blocks: any[];
+  channels: any[];
 }
 
 export default function Page() {
-  const [timePreferences, setTimePreferences] = useState<any[]>([])
-  const [priorityBlocks, setPriorityBlocks] = useState<any[]>([])
-  const [channels, setChannels] = useState<any[]>([])
-  const [copied, setCopied] = useState(false)
+  const [timePreferences, setTimePreferences] = useState<any[]>([]);
+  const [priorityBlocks, setPriorityBlocks] = useState<any[]>([]);
+  const [channels, setChannels] = useState<any[]>([]);
+  const [copied, setCopied] = useState(false);
+  const [generatedData, setGeneratedData] = useState<any>(null);
 
-  const { register, watch, formState: { errors } } = useForm<ConfigFormData>({
+  const {
+    register,
+    watch,
+    formState: { errors },
+  } = useForm<ConfigFormData>({
     resolver: zodResolver(configSchema),
     defaultValues: {
       opening_time: 0,
@@ -45,24 +50,24 @@ export default function Page() {
       switch_penalty: 5,
       termination_penalty: 10,
     },
-  })
+  });
 
-  const formValues = watch()
+  const formValues = watch();
 
   const getFullConfig = (): ConfigData => ({
     ...formValues,
     time_preferences: timePreferences,
     priority_blocks: priorityBlocks,
     channels: channels,
-  })
+  });
 
-  const configJson = JSON.stringify(getFullConfig(), null, 2)
+  const configJson = JSON.stringify(getFullConfig(), null, 2);
 
   const handleCopyJson = () => {
-    navigator.clipboard.writeText(configJson)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
-  }
+    navigator.clipboard.writeText(configJson);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
@@ -82,25 +87,43 @@ export default function Page() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="mx-auto max-w-7xl px-6 py-8">
         <div className="grid gap-8 lg:grid-cols-2">
-          {/* Left Panel - Form */}
           <div className="space-y-6">
-            <BasicSettings register={register} watch={watch} errors={errors} />
-            <TimePreferences items={timePreferences} onChange={setTimePreferences} />
-            <PriorityBlocks items={priorityBlocks} onChange={setPriorityBlocks} />
+            <BasicSettings
+              register={register}
+              watch={watch}
+              errors={errors}
+              timePreferences={timePreferences}
+              priorityBlocks={priorityBlocks}
+              channels={channels}
+              onGenerate={setGeneratedData}
+            />
+            <TimePreferences
+              items={timePreferences}
+              onChange={setTimePreferences}
+            />
+            <PriorityBlocks
+              items={priorityBlocks}
+              onChange={setPriorityBlocks}
+            />
             <Channels items={channels} onChange={setChannels} />
           </div>
 
           {/* Right Panel - JSON Preview */}
-          <div className="lg:sticky lg:top-24 lg:h-fit">
-            <div className="overflow-hidden rounded-2xl border border-slate-200/80 bg-white shadow-lg">
+          <div className="lg:sticky lg:top-24 lg:h-fit space-y-6">
+            {/* Configuration Preview Box */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 shadow-lg">
               <div className="flex items-center justify-between border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-white px-6 py-4">
                 <div>
-                  <h2 className="text-lg font-semibold text-slate-900">Configuration Preview</h2>
-                  <p className="text-xs text-slate-600">Real-time JSON output</p>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Configuration Preview
+                  </h2>
+                  <p className="text-xs text-slate-600">
+                    Real-time JSON output
+                  </p>
                 </div>
+
                 <button
                   onClick={handleCopyJson}
                   className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-95"
@@ -118,9 +141,30 @@ export default function Page() {
                   )}
                 </button>
               </div>
+
               <div className="bg-slate-950 p-6">
                 <pre className="max-h-[500px] overflow-auto rounded-xl bg-slate-900 p-4 text-sm font-mono text-slate-100 leading-relaxed">
                   <code>{configJson}</code>
+                </pre>
+              </div>
+            </div>
+
+            {/* Generated Data Box */}
+            <div className="overflow-hidden rounded-2xl border border-slate-200/80 shadow-lg">
+              <div className="flex items-center justify-between border-b border-slate-200/80 bg-gradient-to-r from-slate-50 to-white px-6 py-4">
+                <div>
+                  <h2 className="text-lg font-semibold text-slate-900">
+                    Generated Data
+                  </h2>
+                  <p className="text-xs text-slate-600">
+                    Parsed configuration structure
+                  </p>
+                </div>
+              </div>
+
+              <div className="bg-slate-950 p-6">
+                <pre className="max-h-[500px] overflow-auto rounded-xl bg-slate-900 p-4 text-sm font-mono text-slate-100 leading-relaxed">
+                  <code>{JSON.stringify(generatedData, null, 2)}</code>
                 </pre>
               </div>
             </div>
@@ -128,5 +172,5 @@ export default function Page() {
         </div>
       </div>
     </div>
-  )
+  );
 }

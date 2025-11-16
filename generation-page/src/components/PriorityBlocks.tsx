@@ -5,9 +5,9 @@ import { Plus, Trash2 } from 'lucide-react'
 interface PriorityBlock {
   id: string
   name: string
-  genre: string
-  time_slot: string
-  weight: number
+  start: number
+  end: number
+  allowed_channels: number[]
 }
 
 export function PriorityBlocks({
@@ -21,9 +21,9 @@ export function PriorityBlocks({
     const newItem: PriorityBlock = {
       id: Date.now().toString(),
       name: 'Block 1',
-      genre: 'News',
-      time_slot: 'Morning',
-      weight: 1,
+      start: 420,
+      end: 600,
+      allowed_channels: [0],
     }
     onChange([...items, newItem])
   }
@@ -46,7 +46,7 @@ export function PriorityBlocks({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">Priority Blocks</h3>
-            <p className="text-xs text-slate-600 mt-0.5">Define content priority zones</p>
+            <p className="text-xs text-slate-600 mt-0.5">Define priority time blocks</p>
           </div>
           <button
             onClick={addItem}
@@ -70,47 +70,64 @@ export function PriorityBlocks({
               className="flex gap-3 rounded-lg border border-slate-200 bg-slate-50 p-4 transition-all hover:border-slate-300 hover:bg-slate-100/50"
             >
               <div className="flex-1 grid grid-cols-2 gap-3 md:grid-cols-4">
+
+                {/* Name */}
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 mb-1">Name</label>
                   <input
                     type="text"
                     value={item.name}
                     onChange={(e) => updateItem(item.id, { name: e.target.value })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                    className="w-full rounded-md border px-2 py-2 text-sm"
                   />
                 </div>
+
+                {/* Start */}
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Genre</label>
-                  <input
-                    type="text"
-                    value={item.genre}
-                    onChange={(e) => updateItem(item.id, { genre: e.target.value })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Time Slot</label>
-                  <input
-                    type="text"
-                    value={item.time_slot}
-                    onChange={(e) => updateItem(item.id, { time_slot: e.target.value })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Weight</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Start (min)</label>
                   <input
                     type="number"
-                    min="1"
-                    value={item.weight}
-                    onChange={(e) => updateItem(item.id, { weight: parseInt(e.target.value) })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                    value={item.start}
+                    onChange={(e) => updateItem(item.id, { start: Number(e.target.value) })}
+                    className="w-full rounded-md border px-2 py-2 text-sm"
+                  />
+                </div>
+
+                {/* End */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">End (min)</label>
+                  <input
+                    type="number"
+                    value={item.end}
+                    onChange={(e) => updateItem(item.id, { end: Number(e.target.value) })}
+                    className="w-full rounded-md border px-2 py-2 text-sm"
+                  />
+                </div>
+
+                {/* Allowed Channels */}
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">
+                    Allowed Channels (comma separated)
+                  </label>
+                  <input
+                    type="text"
+                    value={item.allowed_channels.join(',')}
+                    onChange={(e) =>
+                      updateItem(item.id, {
+                        allowed_channels: e.target.value
+                          .split(',')
+                          .map((v) => Number(v.trim()))
+                          .filter((n) => !isNaN(n)),
+                      })
+                    }
+                    className="w-full rounded-md border px-2 py-2 text-sm"
                   />
                 </div>
               </div>
+
               <button
                 onClick={() => removeItem(item.id)}
-                className="self-center rounded-lg p-2 text-slate-400 transition-all hover:bg-red-50 hover:text-red-600 active:scale-95"
+                className="self-center rounded-lg p-2 text-slate-400 hover:bg-red-50 hover:text-red-600"
               >
                 <Trash2 size={18} />
               </button>
