@@ -4,16 +4,20 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
-import { Plus, Minus, Copy, Check } from "lucide-react";
+import { Plus, Minus, Copy, Check, Download } from "lucide-react";
 import { BasicSettings } from "../components/BasicSettings";
 import { Channels } from "../components/Channels";
 import { PriorityBlocks } from "../components/PriorityBlocks";
 import { TimePreferences } from "../components/TimePreference";
+import { generateSchedule } from "../lib/generate";
 
 const configSchema = z.object({
   opening_time: z.number().min(0).max(1440),
   closing_time: z.number().min(0).max(1440),
   min_duration: z.number().min(1),
+  max_duration: z.number().min(1),
+  min_score: z.number().min(0),
+  max_score: z.number().min(0),
   max_consecutive_genre: z.number().min(1),
   channels_count: z.number().min(1),
   switch_penalty: z.number().min(0),
@@ -45,6 +49,9 @@ export default function Page() {
       opening_time: 0,
       closing_time: 630,
       min_duration: 30,
+      max_duration: 120,
+      min_score: 10,
+      max_score: 100,
       max_consecutive_genre: 2,
       channels_count: 24,
       switch_penalty: 5,
@@ -69,6 +76,27 @@ export default function Page() {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const handleDownloadJson = () => {
+    const fullConfig = getFullConfig();
+    // Transform time_preferences and priority_blocks to remove 'id' field
+    const transformedConfig = {
+      ...fullConfig,
+      time_preferences: timePreferences.map(({ id, ...rest }) => rest),
+      priority_blocks: priorityBlocks.map(({ id, name, ...rest }) => rest),
+    };
+    const data = generateSchedule(transformedConfig);
+    const jsonString = JSON.stringify(data, null, 2);
+    const blob = new Blob([jsonString], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = "kosovo_tv_input_generated.json";
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-100">
       {/* Header */}
@@ -77,10 +105,10 @@ export default function Page() {
           <div className="flex items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-                Configuration Builder
+                Instance Generator for TV Channel Scheduling Optimization
               </h1>
               <p className="mt-1 text-sm text-slate-600">
-                Fine-tune your broadcast scheduling parameters
+                Generate instances for TV channel scheduling problem in public spaces
               </p>
             </div>
           </div>
@@ -124,22 +152,31 @@ export default function Page() {
                   </p>
                 </div>
 
-                <button
-                  onClick={handleCopyJson}
-                  className="inline-flex items-center gap-2 rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-slate-800 active:scale-95"
-                >
-                  {copied ? (
-                    <>
-                      <Check size={16} />
-                      Copied
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={16} />
-                      Copy JSON
-                    </>
-                  )}
-                </button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCopyJson}
+                    className="inline-flex items-center gap-2 rounded-lg bg-slate-700 px-3 py-2 text-sm font-medium text-white transition-all hover:bg-slate-600 active:scale-95"
+                  >
+                    {copied ? (
+                      <>
+                        <Check size={16} />
+                        Copied
+                      </>
+                    ) : (
+                      <>
+                        <Copy size={16} />
+                        Copy JSON
+                      </>
+                    )}
+                  </button>
+                  <button
+                    onClick={handleDownloadJson}
+                    className="inline-flex items-center gap-2 rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-blue-700 active:scale-95 shadow-sm"
+                  >
+                    <Download size={16} />
+                    Download JSON file
+                  </button>
+                </div>
               </div>
 
               <div className="bg-slate-950 p-6">

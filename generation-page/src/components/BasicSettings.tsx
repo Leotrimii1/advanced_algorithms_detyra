@@ -24,12 +24,52 @@ export function BasicSettings({
 
     const sliderSettings = [
     {
+      key: "opening_time",
+      label: "Opening Time",
+      min: 0,
+      max: 1440,
+      unit: "min",
+      description: "Start time of broadcast period",
+    },
+    {
+      key: "closing_time",
+      label: "Closing Time",
+      min: 0,
+      max: 1440,
+      unit: "min",
+      description: "End time of broadcast period",
+    },
+    {
       key: "min_duration",
-      label: "Min Duration",
+      label: "Min Program Duration",
       min: 1,
       max: 120,
       unit: "min",
-      description: "Minimum segment duration",
+      description: "Minimum program duration",
+    },
+    {
+      key: "max_duration",
+      label: "Max Program Duration",
+      min: 1,
+      max: 300,
+      unit: "min",
+      description: "Maximum program duration",
+    },
+    {
+      key: "min_score",
+      label: "Min Program Score",
+      min: 0,
+      max: 100,
+      unit: "pts",
+      description: "Minimum score for programs",
+    },
+    {
+      key: "max_score",
+      label: "Max Program Score",
+      min: 0,
+      max: 200,
+      unit: "pts",
+      description: "Maximum score for programs",
     },
     {
       key: "max_consecutive_genre",
@@ -91,65 +131,16 @@ export function BasicSettings({
         <div>
           <button
             onClick={() => generateData()}
-            className="bg-blue-500 text-white rounded p-1"
+              className="inline-flex items-center gap-2 rounded-lg bg-green-600 px-4 py-2 text-sm font-medium text-white transition-all hover:bg-green-700 active:scale-95 shadow-sm"
           >
-            Generate JSON
+            Generate Instance
           </button>
         </div>
       </div>
 
       <div className="space-y-6 p-6">
-        {/* Time Inputs */}
-        <div className="space-y-4">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">
-                Opening Time
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  {...register("opening_time", { valueAsNumber: true })}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
-                  placeholder="0"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">
-                  min
-                </span>
-              </div>
-              {errors.opening_time && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.opening_time.message}
-                </p>
-              )}
-            </div>
-
-            <div>
-              <label className="block text-sm font-semibold text-slate-900 mb-2">
-                Closing Time
-              </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  {...register("closing_time", { valueAsNumber: true })}
-                  className="w-full rounded-lg border border-slate-300 bg-white px-4 py-3 text-slate-900 placeholder-slate-400 transition-all focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 outline-none"
-                  placeholder="0"
-                />
-                <span className="absolute right-4 top-1/2 -translate-y-1/2 text-sm text-slate-500 font-medium">
-                  min
-                </span>
-              </div>
-              {errors.closing_time && (
-                <p className="mt-1 text-xs text-red-600">
-                  {errors.closing_time.message}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
-
         {/* Sliders */}
-        <div className="space-y-6 border-t border-slate-200 pt-6">
+        <div className="space-y-6">
           {sliderSettings.map((setting) => (
             <div key={setting.key}>
               <div className="mb-3 flex items-center justify-between">

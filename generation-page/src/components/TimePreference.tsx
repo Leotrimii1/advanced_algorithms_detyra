@@ -4,10 +4,10 @@ import { Plus, Trash2 } from 'lucide-react'
 
 interface TimePreference {
   id: string
-  day: string
-  start_time: number
-  end_time: number
-  priority: number
+  start: number
+  end: number
+  preferred_genre: string
+  bonus: number
 }
 
 export function TimePreferences({
@@ -17,13 +17,22 @@ export function TimePreferences({
   items: TimePreference[]
   onChange: (items: TimePreference[]) => void
 }) {
+  const GENRES = [
+    "news",
+    "sports",
+    "music",
+    "movies",
+    "kids",
+    "documentary",
+  ];
+
   const addItem = () => {
     const newItem: TimePreference = {
       id: Date.now().toString(),
-      day: 'Monday',
-      start_time: 8,
-      end_time: 17,
-      priority: 1,
+      start: 0,
+      end: 60,
+      preferred_genre: 'news',
+      bonus: 10,
     }
     onChange([...items, newItem])
   }
@@ -46,7 +55,7 @@ export function TimePreferences({
         <div className="flex items-center justify-between">
           <div>
             <h3 className="text-lg font-semibold text-slate-900">Time Preferences</h3>
-            <p className="text-xs text-slate-600 mt-0.5">Schedule time slots and priorities</p>
+            <p className="text-xs text-slate-600 mt-0.5">Define preferred genres for specific time periods</p>
           </div>
           <button
             onClick={addItem}
@@ -71,46 +80,44 @@ export function TimePreferences({
             >
               <div className="flex-1 grid grid-cols-2 gap-3 md:grid-cols-4">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Day</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Start (min)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={item.start}
+                    onChange={(e) => updateItem(item.id, { start: parseInt(e.target.value) })}
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">End (min)</label>
+                  <input
+                    type="number"
+                    min="0"
+                    value={item.end}
+                    onChange={(e) => updateItem(item.id, { end: parseInt(e.target.value) })}
+                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Preferred Genre</label>
                   <select
-                    value={item.day}
-                    onChange={(e) => updateItem(item.id, { day: e.target.value })}
+                    value={item.preferred_genre}
+                    onChange={(e) => updateItem(item.id, { preferred_genre: e.target.value })}
                     className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                   >
-                    {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map(day => (
-                      <option key={day} value={day}>{day}</option>
+                    {GENRES.map(genre => (
+                      <option key={genre} value={genre}>{genre}</option>
                     ))}
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Start (hr)</label>
+                  <label className="block text-xs font-semibold text-slate-600 mb-1">Bonus</label>
                   <input
                     type="number"
                     min="0"
-                    max="23"
-                    value={item.start_time}
-                    onChange={(e) => updateItem(item.id, { start_time: parseInt(e.target.value) })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">End (hr)</label>
-                  <input
-                    type="number"
-                    min="0"
-                    max="23"
-                    value={item.end_time}
-                    onChange={(e) => updateItem(item.id, { end_time: parseInt(e.target.value) })}
-                    className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-slate-600 mb-1">Priority</label>
-                  <input
-                    type="number"
-                    min="1"
-                    value={item.priority}
-                    onChange={(e) => updateItem(item.id, { priority: parseInt(e.target.value) })}
+                    value={item.bonus}
+                    onChange={(e) => updateItem(item.id, { bonus: parseInt(e.target.value) })}
                     className="w-full rounded-md border border-slate-300 bg-white px-2 py-2 text-sm text-slate-900 focus:border-blue-500 focus:ring-1 focus:ring-blue-500 outline-none"
                   />
                 </div>
